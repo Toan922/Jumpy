@@ -1,9 +1,10 @@
 from file_reader import reader, writer
+from move_evaluation import move_generation as moves
 
 def main():
     board_state = reader("board1.txt")
 
-    print(board_state)
+    moves(board_state)
 
     writer("board2.txt", board_state)
 
