@@ -1,26 +1,30 @@
-def reader(board1_name):
+def reader(board1_name: str) -> list:
+    # tries to read the file used as argument 1 within the command line input, if it does not exist then print an error message
 
-    # opens the board1 file and extracts the board state from the file as a string
+    try:
+        # opens the board1 file and extracts the board state from the file as a string
 
-    with open(board1_name, "r") as reader:
-        board_string = reader.read()
+        with open(board1_name, "r") as reader:
+            board_string = reader.read()
     
-    # takes the board state in string form and extracts each character to place into an array to be returned
+        # takes the board state in string form and extracts each character to place into an array to be returned
     
-    board_state = list(board_string)
+        board_state = list(board_string)
 
-    reader.close()
+        reader.close()
 
-    return board_state
+        return board_state
+    
+    # if a file does not exist then print the file not found message w/ the file name
+    
+    except FileNotFoundError:
+        print(f"The {board1_name} file does not exist, please try again with the correct file name")
 
-def writer(board2_name, board_list):
 
-    # joins the board list back together as a string to be written to board2 file
-    board_string = "".join(board_list)
-
+def writer(board2_name: str, board_str: str):
     # writes to the board2 file with the determined "optimal" game state after white's move
 
     with open(board2_name, "w") as writer:
-        writer.write(board_string)
+        writer.write(board_str)
 
     writer.close()
