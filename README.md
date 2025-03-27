@@ -1,1 +1,1 @@
-# CS4365
+# Jumpy Project
