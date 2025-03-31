@@ -11,8 +11,8 @@ params: depth = the depth of the game tree
         game_path = the current game path being evaluated
 
 return: the static evaluation of the leaf board states
-'''       
-def max_min(depth: int, board_state: list, static_evaluation_counter: list, game_path: list) -> int:
+'''
+def max_min(depth: int, board_state: list, static_evaluation_counter: list, game_path: list, alpha: int, beta: int) -> int:
     # determine the depth of the current game state being evaluated
     
     # when the depth is 0 then a leaf node has been reached and thus static evaluation must be performed
@@ -32,12 +32,18 @@ def max_min(depth: int, board_state: list, static_evaluation_counter: list, game
 
             # append the current position to the game path
             current_path.append(possible_position)
-            evaluation = max(static_evaluation, min_max(depth - 1, possible_position, static_evaluation_counter, current_path))
+            evaluation = max(static_evaluation, min_max(depth - 1, possible_position, static_evaluation_counter, current_path, alpha, beta))
 
             # if the current evaluation is greater than the previous static evaluation then set the game path to be the current path
             if evaluation > static_evaluation:
                 static_evaluation = evaluation
                 best_path = current_path
+            
+            # perform alpha-beta pruning
+            if evaluation >= beta:
+                return evaluation
+            else:
+                alpha = max(alpha, evaluation)
         
         if best_path is not None:
             # set the game path to be the best path
@@ -55,8 +61,8 @@ params: depth = the depth of the game tree
         game_path = the current game path being evaluated
 
 return: the static evaluation of the leaf board states
-'''           
-def min_max(depth: int, board_state: list, static_evaluation_counter: list, game_path: list) -> int:
+'''       
+def min_max(depth: int, board_state: list, static_evaluation_counter: list, game_path: list, alpha: int, beta: int) -> int:
     # determine the depth of the current game state being evaluated
     
     # when the depth is 0 then a leaf node has been reached and thus static evaluation must be performed
@@ -75,12 +81,18 @@ def min_max(depth: int, board_state: list, static_evaluation_counter: list, game
 
             # append the current position to the game path
             current_path.append(possible_position)
-            evaluation = min(static_evaluation, max_min(depth - 1, possible_position, static_evaluation_counter, current_path))
+            evaluation = min(static_evaluation, max_min(depth - 1, possible_position, static_evaluation_counter, current_path, alpha, beta))
 
             # if the current evaluation is greater than the previous static evaluation then set the game path to be the current path
             if evaluation < static_evaluation:
                 static_evaluation = evaluation
                 best_path = current_path
+                
+            # perform alpha-beta pruning
+            if evaluation <= alpha:
+                return evaluation
+            else:
+                beta = min(alpha, evaluation)
         
         if best_path is not None:
             # set the game path to be the best path

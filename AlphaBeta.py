@@ -3,7 +3,7 @@
 
 from file_reader import reader as read, writer as write
 from generate_move import generate_moves_white as make_moves
-from mini_max import max_min as mini_max
+from alpha_beta import max_min as alpha_beta
 import sys
 
 '''
@@ -19,7 +19,7 @@ def white_move():
     
     # gets the depth to be evaluated to for the MiniMax algorithm
     depth_evaluated = int(sys.argv[3])
-        
+    
     # reads the board state from the initial board file as a list to then be evaluated
     board_state = read(initial_board)
 
@@ -31,8 +31,12 @@ def white_move():
     
     game_path = []
 
+    # set initial values for alpha and beta to be the lowest and highest possible values
+    alpha = -1000
+    beta = 1000
+    
     # get the value of the highest static evaluation from mini max being performed
-    static_evaluation = mini_max(depth_evaluated, board_state, static_evaluation_counter, game_path)
+    static_evaluation = alpha_beta(depth_evaluated, board_state, static_evaluation_counter, game_path, alpha, beta)
 
     for move in potential_moves:
         # check which move is the progenitor of the best path

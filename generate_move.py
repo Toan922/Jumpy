@@ -51,27 +51,9 @@ def generate_moves_black(board_state: list) -> list:
     # initialize a positions list to place positions of white pieces into
     positions = []
 
-    # reverse the board state to evaluate black pieces as if they were white pieces
-    board_state.reverse()
-    
-    # changes each piece into the corresponding opponent piece i.e B <-> W and b <-> w
-    for index in range(len(board_state)):
-        # set the current piece to be whatever value is in the current index
-        piece = board_state[index]
-        
-        # determine if the piece is white or black and more specifically if it is a king or pawn piece
-        if piece == 'B':
-            # if the piece is a black king set it to be the white king
-            board_state[index] = 'W'
-        elif piece == 'b':
-            # if the piece is a black pawn set it to be the white pawn
-            board_state[index] = 'w'
-        elif piece == 'W':
-            # if the piece is a white king set it to be the black king
-            board_state[index] = 'B'
-        elif piece == 'w':
-            # if the piece is a white pawn set it to be the black pawn
-            board_state[index] = 'b'
+    # work on a copied and flipped version of the original game board
+    copied_flipped_board = board_state.copy()
+    flip_board(copied_flipped_board)
     
     '''
     looks through copied board until a w or W is found and places the position of the white pieces 
@@ -86,8 +68,8 @@ def generate_moves_black(board_state: list) -> list:
     
     # evaluate all possible moves per white piece in board state
     for position in positions:
-        # work on a copy of the actual board state every iteration
-        copy_board = board_state.copy()
+        # work on a copy of the flipped board state for every iteration
+        copy_board = copied_flipped_board.copy()
 
         # determine which kind of move is the piece able to perform
         if position == 15:
@@ -100,30 +82,42 @@ def generate_moves_black(board_state: list) -> list:
             # otherwise the piece is performing a jump
             jumps(position, copy_board, possible_moves)
 
-    for index in range(len(possible_moves)):
-        # flip back the colors of the piece so that black move was evaluated
-        for position in range(len(possible_moves[index])):
-        # set the current piece to be whatever value is in the current index
-            piece = possible_moves[index][position]
-
-            # determine if the piece is white or black and more specifically if it is a king or pawn piece
-            if piece == 'B':
-                # if the piece is a black king set it to be the white king
-                possible_moves[index][position] = 'W'
-            elif piece == 'b':
-                # if the piece is a black pawn set it to be the white pawn
-                possible_moves[index][position] = 'w'
-            elif piece == 'W':
-                # if the piece is a white king set it to be the black king
-                possible_moves[index][position] = 'B'
-            elif piece == 'w':
-                # if the piece is a white pawn set it to be the black pawn
-                possible_moves[index][position] = 'b'
-                
-        # reverse the order of the optimal move to get correct orientation
-        possible_moves[index].reverse()
+    for move in range(len(possible_moves)):
+        # flip the board state back to the original orientation and change each piece to be the corresponding opponent piece
+        flip_board(possible_moves[move])
     
     return possible_moves
+
+'''
+module is designed to flip the game board state such that if a black piece were to be evaluated it would
+be evaluated as a white piece
+params: position = integer representing where on a 0-15 index that piece is currently 
+                -> expected to be 15 in this case
+        game_board = the copied version of the original game board
+        potential_moves = a list housing all the potential board states based on which piece moved
+'''
+def flip_board(game_board: list):
+    # reverse the board state to evaluate black pieces as if they were white pieces
+    game_board.reverse()
+    
+    # changes each piece into the corresponding opponent piece i.e B <-> W and b <-> w
+    for index in range(len(game_board)):
+        # set the current piece to be whatever value is in the current index
+        piece = game_board[index]
+        
+        # determine if the piece is white or black and more specifically if it is a king or pawn piece
+        if piece == 'B':
+            # if the piece is a black king set it to be the white king
+            game_board[index] = 'W'
+        elif piece == 'b':
+            # if the piece is a black pawn set it to be the white pawn
+            game_board[index] = 'w'
+        elif piece == 'W':
+            # if the piece is a white king set it to be the black king
+            game_board[index] = 'B'
+        elif piece == 'w':
+            # if the piece is a white pawn set it to be the black pawn
+            game_board[index] = 'b'
 
 '''
 module is designed to generate the game board state after a piece has left the game area and
@@ -161,10 +155,10 @@ params: position = integer representing where on a 0-15 index that piece is curr
         potential_moves = a list housing all the potential board states based on which piece moved
 '''
 def jumps(position: int, game_board: list, potential_moves: list):
+    jump = None
+    
     # see all possible free spaces in the board_state
     free_spaces = [index for index, space in enumerate(game_board) if space == 'x']
-
-    jump = None
     
     # compare index of free spaces to white position to see the first empty space to the right
     for index in free_spaces:
@@ -195,10 +189,17 @@ def jumps(position: int, game_board: list, potential_moves: list):
         
     # otherwise if the piece jumped over is a black piece thus reset the black piece to the rightmost free space
     elif game_board[position + 1] == 'b' or game_board[position + 1] == 'B':
-        # if the piece jumped over is a black piece then reset the black piece to the rightmost free space
-        game_board[max(free_spaces)] = game_board[position + 1]
-        
-        # perform the white jump and append the new board state to potential moves list
+        # perform the white jump and free up the current white space and append the new board state to potential moves list
         game_board[jump] = game_board[position]
         game_board[position] = 'x'
+        
+        # recheck all possible free spaces in the board_state
+        free_spaces = [index for index, space in enumerate(game_board) if space == 'x']
+
+        # determine if the black piece that was jumped over is past the rightmost free space
+        # if the rightmost free space is greater than the jump then set the black piece to be the rightmost free space
+        if max(free_spaces) > position + 1:
+            game_board[max(free_spaces)] = game_board[position + 1]
+            game_board[position + 1] = 'x'
+        
         potential_moves.append(game_board)
