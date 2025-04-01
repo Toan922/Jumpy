@@ -3,7 +3,7 @@
 
 from file_reader import reader as read, writer as write
 from generate_move import generate_moves_white as make_moves
-from mini_max import max_min as mini_max
+from mini_max_improved import max_min as mini_max
 import sys
 
 '''

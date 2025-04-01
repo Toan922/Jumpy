@@ -1,4 +1,4 @@
-from static_evaluation import estimate_position as estimate
+from static_evaluation_improved import estimate_position as estimate
 from generate_move import generate_moves_white as move_white
 from generate_move import generate_moves_black as move_black
 
